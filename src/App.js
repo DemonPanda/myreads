@@ -11,7 +11,8 @@ class BooksApp extends React.Component {
 
     state = {
         books: [],
-        searchBooks: []
+        searchBooks: [],
+        searchError: false
     };
 
     componentDidMount() {
@@ -43,7 +44,13 @@ class BooksApp extends React.Component {
     updateQuery = (query) => {
         if(query){
             BooksAPI.search(query, this.MAX_RESULTS).then((books) => {
-
+                if (books.error) {
+                    this.setState({
+                        searchBooks: [],
+                        searchError: true
+                    });
+                    return;
+                }
                 if(books.length){
                     books.forEach((book, index) => {
                         let myBook = this.state.books.find((b) => b.id === book.id);
@@ -52,7 +59,8 @@ class BooksApp extends React.Component {
                     });
 
                     this.setState({
-                        searchBooks: books
+                        searchBooks: books,
+                        searchError: false
                     });
                 }
 
@@ -102,6 +110,7 @@ class BooksApp extends React.Component {
                         books={this.state.searchBooks}
                         updateQuery={this.updateQuery}
                         changeShelf={this.changeShelf}
+                        searchError={this.state.searchError}
                     />
                 )}/>
             </div>
